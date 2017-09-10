@@ -2,8 +2,12 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
+import serial
+
 CAMERA_DEV  = 1;
 cap = cv2.VideoCapture(CAMERA_DEV)
+
+ser = serial.Serial('/dev/ttyACM0')
 
 while(True):
     # Capture frame-by-frame
@@ -67,6 +71,11 @@ while(True):
     #cv2.imshow("Cavity", cavity_map)
     cv2.imshow("Cavity", frame2)
 
+    if ser.in_waiting >= 6:
+        ser_reading = ser.read(6)
+        if (ser_reading == "Button"):
+            cv2.imwrite("cavities.png", frame2)
+
     # If gradient above threshold, find contour of cavity
     
     # Display cavity
@@ -81,3 +90,4 @@ while(True):
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
+ser.close()
